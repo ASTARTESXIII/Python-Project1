@@ -1,48 +1,70 @@
-import os
-import nest_asyncio
-import asyncio
-from dotenv import load_dotenv  # Импортируем библиотеку для работы с .env
+import logging
+import requests
 from telegram import Update
-from telegram.ext import Application, CommandHandler, ContextTypes
+from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 
-# Применение nest_asyncio для поддержки asyncio в текущем окружении
-nest_asyncio.apply()
+# Настройка логирования
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    level=logging.INFO
+)
 
-# Загружаем переменные окружения из файла .env
-load_dotenv()
+# Функция для сбора вакансий
+def fetch_vacancies(region):
+    url = f'https://api.hh.ru/vacancies?text=информационная+безопасность&area={region}'
+    response = requests.get(url)
 
-# Функция для команды /start
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await update.message.reply_text("Привет! Я помогу тебе с анализом вакансий.")
+    if response.status_code == 200:
+        vacancies = response.json()
+        # Фильтрация вакансий по ключевым словам
+        keywords = ["информационная безопасность", "пентестер", "специалист по информационной безопасности", 
+                    "администратор по информационной безопасности", "анализ безопасности", "инженер по безопасности"]
+        filtered_vacancies = [
+            vacancy for vacancy in vacancies['items']
+            if any(keyword in vacancy['name'].lower() for keyword in keywords)
+        ]
+        return len(filtered_vacancies), filtered_vacancies
+    else:
+        return 0, []
 
-# Функция для команды /help
-async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await update.message.reply_text("Используйте команду /start для начала.")
+# Команда /start
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text('Привет! Введите команду /vacancies, чтобы найти вакансии в Екатеринбурге.')
 
-# Обработчик ошибок
-async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    print(f"Произошла ошибка: {context.error}")
+# Команда /vacancies
+async def vacancies(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    region = 3  # ID для Екатеринбурга
+    count, vacancies = fetch_vacancies(region)
 
-# Основная функция запуска бота
-async def main() -> None:
-    # Получаем токен из переменных окружения
-    token = os.getenv("TELEGRAM_TOKEN")
+    if count == 0:
+        await update.message.reply_text('Вакансии не найдены.')
+    else:
+        message = "Найденные вакансии на hh.ru:\n\n"
+        
+        for vacancy in vacancies:
+            title = vacancy['name']
+            salary = vacancy.get('salary')
+            if salary:
+                salary_info = f"{'от ' + str(salary['from']) + ' RUR' if salary['from'] else 'Зарплата не указана'}"
+            else:
+                salary_info = "Зарплата не указана"
+            company = vacancy['employer']['name']
+            link = vacancy['alternate_url']
+            
+            message += (
+                f"Вакансия: {title}\n"
+                f"Зарплата: {salary_info}\n"
+                f"Компания: {company}\n"
+                f"Ссылка: {link}\n\n"
+            )
+        
+        await update.message.reply_text(message)
 
-    if not token:
-        raise ValueError("Токен не найден! Убедитесь, что TELEGRAM_TOKEN установлен в файле .env.")
-
-    # Создаем приложение
-    application = Application.builder().token(token).build()
-
-    # Добавляем обработчики команд /start и /help
-    application.add_handler(CommandHandler("start", start))
-    application.add_handler(CommandHandler("help", help_command))
-
-    # Добавляем обработчик ошибок
-    application.add_error_handler(error_handler)
-
-    # Запускаем бота
-    await application.run_polling()
-
+# Основная функция
 if __name__ == '__main__':
-    asyncio.run(main())
+    app = ApplicationBuilder().token('7891800291:AAHaImzymyPDMTNzXhqHOg_MK6Cs_9_MY68').build()
+
+    app.add_handler(CommandHandler('start', start))
+    app.add_handler(CommandHandler('vacancies', vacancies))
+
+    app.run_polling()
