@@ -10,38 +10,63 @@ logging.basicConfig(
 )
 
 # Функция для сбора вакансий
-def fetch_vacancies(region):
-    url = f'https://api.hh.ru/vacancies?text=информационная+безопасность&area={region}'
-    response = requests.get(url)
+def fetch_vacancies():
+    url = 'https://api.hh.ru/vacancies'
+    keywords = [
+        "информационная безопасность", "пентестер", "специалист по информационной безопасности",
+        "администратор по информационной безопасности", "анализ безопасности", "инженер по безопасности",
+        "сервисы информационной безопасности", "информационной безопасности",
+        "специалист по информационной безопасности (IT компания)", "ведущий инженер по информационной безопасности",
+        "специалист по защите информации", "аналитик по информационной безопасности",
+        "инженер по защите информации", "менеджер по защите ИТ-инфраструктуры",
+        "отдел информационной безопасности региона", "системный инженер по SIEM",
+        "ведущий специалист по защите информации", "инженер-аналитик информационной безопасности"
+    ]
+    all_vacancies = []
+    page = 0
 
-    if response.status_code == 200:
+    while True:
+        params = {
+            'text': 'информационная безопасность',
+            'area': 113,  # Россия
+            'page': page,
+            'per_page': 50  # Максимально возможное значение
+        }
+        response = requests.get(url, params=params)
+        if response.status_code != 200:
+            break
+
         vacancies = response.json()
-        # Фильтрация вакансий по ключевым словам
-        keywords = ["информационная безопасность", "пентестер", "специалист по информационной безопасности", 
-                    "администратор по информационной безопасности", "анализ безопасности", "инженер по безопасности"]
+        items = vacancies.get('items', [])
+        if not items:
+            break
+
         filtered_vacancies = [
-            vacancy for vacancy in vacancies['items']
+            vacancy for vacancy in items
             if any(keyword in vacancy['name'].lower() for keyword in keywords)
         ]
-        return len(filtered_vacancies), filtered_vacancies
-    else:
-        return 0, []
+        all_vacancies.extend(filtered_vacancies)
+
+        page += 1
+        if page >= vacancies.get('pages', 1):  # Проверяем, достигли ли последней страницы
+            break
+
+    return len(all_vacancies), all_vacancies
 
 # Команда /start
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text('Привет! Введите команду /vacancies, чтобы найти вакансии в Екатеринбурге.')
+    await update.message.reply_text('Привет! Введите команду /vacancies, чтобы найти вакансии по всей России.')
 
 # Команда /vacancies
 async def vacancies(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    region = 3  # ID для Екатеринбурга
-    count, vacancies = fetch_vacancies(region)
+    count, vacancies = fetch_vacancies()
 
     if count == 0:
         await update.message.reply_text('Вакансии не найдены.')
     else:
-        message = "Найденные вакансии на hh.ru:\n\n"
+        message = "Найденные вакансии на hh.ru по всей России:\n\n"
         
-        for vacancy in vacancies:
+        for vacancy in vacancies[:10]:  # Ограничиваем список 10 вакансиями
             title = vacancy['name']
             salary = vacancy.get('salary')
             if salary:
