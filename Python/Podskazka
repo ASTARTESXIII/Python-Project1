@@ -38,3 +38,6 @@
 
 # Изменение юзерагента
 # option.set_preference('general.useragent.override', 'Сюда юзерагента')
+
+# Библиотека by для find_element
+# from selenium.webdriver.common.by import By
