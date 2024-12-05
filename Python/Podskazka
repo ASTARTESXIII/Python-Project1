@@ -1,0 +1,40 @@
+# .get() - передали урл как аргумент
+# .save_screenshot('сюда имя файла с расширением пнг')
+# .refresh() обновить страницу
+# .quit() закрыть браузер
+
+# В формате full xpath можем передать кнопки
+# метод find_element/s(для одного или всех) by ...смотри сам
+
+# .get_attribute("Сюда вводить какой аттрибут взять href или класс...")
+# кнопку искать по хпаз, желательно присвоить переменную.
+
+# Строку для текста искать так же через хпаз
+# Метод .send_keys('Сюда вводи нужное значение')
+# Хз, моя мысль что прекрасно засунуть сюда функцию с четырьмя аргументами (хпаз для логина, логин, хпаз для пароля, пароль)
+
+# Скроллинг выглядит так:
+# импортируем keys
+# from selenium.webdriver.common.keys import Keys
+# Библиотека для отправки нажатий кнопок с клавиатуры
+# Получаем html разметку и отправляем .send_keys(Keys.Кнопка которую нужно нажать)
+# В цикле хорошо скроллится.
+
+# about:config для фаерфокса, ищем конфиг
+# dom.webdriver.enabled С True на False
+
+# Набор опций для фаерфокса
+# option = webdriver.FirefoxOptions()
+# option.set_preference('Сюда передаём опцию', Сюда передаём флаг)
+# Потом надо передать это в браузер
+# browser = webdriver.Firefox(options=option)
+
+# Выключение звука и убрать уведомления.
+# option.set_preference('dom.webnotifications.enabled', False)
+# option.set_preference('media.volume_scale', '0.0')
+
+# Работа в фоне
+# option.headless = True
+
+# Изменение юзерагента
+# option.set_preference('general.useragent.override', 'Сюда юзерагента')
