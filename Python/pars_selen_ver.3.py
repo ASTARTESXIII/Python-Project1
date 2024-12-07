@@ -55,7 +55,7 @@ for i in range(len(href_page)):
 list_href = sorted(list_href)
 
 list_vacansy_href = set()
-for i in list_href:
+for i in list_href:            #Это пизда, собираем все ссылки до 5 страниц.
     response = requests.get(i).text
     block = BeautifulSoup(response, 'lxml')
     tmp = block.find('div', class_='vacancies-new__list').find_all('a', href=True)
