@@ -1,4 +1,0 @@
-import request
-import bs4
-def function_on_parsing():
-    pass
