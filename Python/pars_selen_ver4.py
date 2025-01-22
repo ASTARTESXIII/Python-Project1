@@ -132,7 +132,7 @@ def character_vacansy(count_user_step, list_vacansy_href):
 
 #####################################
 #Телеграм бот, библиотека aiogram
-bot = Bot(token='8033191047:AAHWMjVwGp0kxt99mqSGW8-cqhB1m1rnQic')
+bot = Bot(token='')
 dp = Dispatcher()
 
 kb = ReplyKeyboardMarkup(keyboard=[
