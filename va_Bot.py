@@ -9,7 +9,7 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO)
 
-TOKEN = "7555084230:AAHUDNfvjGduPeULzaNSWV3swoDB3Jh6HRc"
+TOKEN = "bot_token"
 MAX_VACANCIES = 100  # Максимум 100 вакансий для запроса
 VACANCIES_FILE = "vacancies.csv"
 ANALYSIS_FILE = "analysis.csv"
