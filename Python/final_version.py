@@ -52,7 +52,7 @@ def search_city_and_proff(city, proff):
     button_for_search = "/html/body/main/div/form/div[1]/div[1]/button"
     browser.find_element(By.XPATH, button_for_search).click()
 
-    time.sleep(10)
+    time.sleep(7)
     page = browser.page_source
     browser.close()
     return page
@@ -76,7 +76,6 @@ def get_vacansy_href(page):
         tmp = block.find('div', class_='vacancies-new__list').find_all('a', href=True)
         tmp_set = {'https://dreamjob.ru' + k.get('href') for k in tmp if 'empl' in k.get('href')}
         list_vacansy_href.update(tmp_set)
-        time.sleep(5)
 
     #count_user_step = 10 # !!! Число вакансий от юзера, до 50 штук
     list_vacansy_href = list(list_vacansy_href)
@@ -146,7 +145,6 @@ def character_vacansy(count_user_step, list_vacansy_href):
         else:
             tmp_dict['skills'] = 'Требования не указаны...'
         href_dict[i] = tmp_dict
-        time.sleep(random.randrange(3, 10))
     salary_stat = ''
     for i in href_dict:
         salary_stat += href_dict[i]['salary'].strip() + '@'
@@ -201,7 +199,7 @@ def extract_top_requirements(skills, top_n=10):
 
 #####################################
 #Телеграм бот, библиотека aiogram
-bot = Bot(token='8033191047:AAHWMjVwGp0kxt99mqSGW8-cqhB1m1rnQic')
+bot = Bot(token='')
 dp = Dispatcher()
 
 kb = ReplyKeyboardMarkup(keyboard=[
@@ -270,7 +268,6 @@ async def step_save(message: Message, state: FSMContext):
 #    await message.answer(last_dict)
     for i, j in last_dict.items():
         await message.answer(f'Ссылка на вакансию: {i}\nВакансия: {j['name']}\nЗаработная плата: {j['salary']}\nТребования:\n{j['skills']}')
-        time.sleep(2)
     await state.clear()
 
 
