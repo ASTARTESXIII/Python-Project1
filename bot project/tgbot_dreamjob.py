@@ -2,7 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import telebot
 
-bot = telebot.TeleBot('8033191047:AAHWMjVwGp0kxt99mqSGW8-cqhB1m1rnQic')
+bot = telebot.TeleBot('')
 city_number = (
     {}
 )  # Я словари ещё не прошёл блин, не могу ассоциации по номерам простроить, скоро уже пройду.
